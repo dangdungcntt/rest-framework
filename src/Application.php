@@ -3,20 +3,22 @@
 namespace Rest;
 
 use Closure;
-use Rest\DI\Container;
-use Rest\Exceptions\Handler;
-use Rest\Middleware\RequestBodyJsonParserMiddleware;
 use Exception;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use React\Http\Server as HttpServer;
 use React\Socket\Server as SocketServer;
 use ReflectionException;
+use Rest\DI\Container;
+use Rest\Exceptions\Handler;
+use Rest\Middleware\RequestBodyJsonParserMiddleware;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 class Application
 {
+    const VERSION = '1.0.0';
+
     protected static Application $app;
     protected Container $container;
     public Environment $view;
