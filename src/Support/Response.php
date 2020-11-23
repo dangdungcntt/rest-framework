@@ -54,7 +54,9 @@ class Response extends Psr7Response
 
     public function redirect(string $to, int $status = 302, array $headers = []): Response
     {
-        return $this->withHeader('Location', $to)->withHeaders($headers);
+        return $this->withHeader('Location', $to)
+            ->withStatus($status)
+            ->withHeaders($headers);
     }
 
     public function withHeaders(array $headers)
