@@ -30,7 +30,7 @@ if (!function_exists('view')) {
 }
 
 if (!function_exists('response')) {
-    function response()
+    function response(): Response
     {
         return new Response();
     }
@@ -43,23 +43,21 @@ if (!function_exists('env')) {
     }
 }
 
-if (!function_exists('dd')) {
-    /**
-     * @param  mixed  ...$vars
-     * @throws DumpDieException|ErrorException
-     */
-    function dd(...$vars)
-    {
-        $cloner = new VarCloner();
-        $output = fopen('php://memory', 'r+b');
-        $dumper = new HtmlDumper($output);
+/**
+ * @param  mixed  ...$vars
+ * @throws DumpDieException|ErrorException
+ */
+function dd(...$vars)
+{
+    $cloner = new VarCloner();
+    $output = fopen('php://memory', 'r+b');
+    $dumper = new HtmlDumper($output);
 
-        foreach ($vars as $var) {
-            $dumper->dump($cloner->cloneVar($var), $output);
-        }
-
-        throw new DumpDieException(stream_get_contents($output, -1, 0));
+    foreach ($vars as $var) {
+        $dumper->dump($cloner->cloneVar($var), $output);
     }
+
+    throw new DumpDieException(stream_get_contents($output, -1, 0));
 }
 
 
