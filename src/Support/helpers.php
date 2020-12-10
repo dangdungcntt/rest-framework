@@ -43,21 +43,23 @@ if (!function_exists('env')) {
     }
 }
 
-/**
- * @param  mixed  ...$vars
- * @throws DumpDieException|ErrorException
- */
-function dd(...$vars)
-{
-    $cloner = new VarCloner();
-    $output = fopen('php://memory', 'r+b');
-    $dumper = new HtmlDumper($output);
+if (!function_exists('ddd')) {
+    /**
+     * @param  mixed  ...$vars
+     * @throws DumpDieException|ErrorException
+     */
+    function ddd(...$vars)
+    {
+        $cloner = new VarCloner();
+        $output = fopen('php://memory', 'r+b');
+        $dumper = new HtmlDumper($output);
 
-    foreach ($vars as $var) {
-        $dumper->dump($cloner->cloneVar($var), $output);
+        foreach ($vars as $var) {
+            $dumper->dump($cloner->cloneVar($var), $output);
+        }
+
+        throw new DumpDieException(stream_get_contents($output, -1, 0));
     }
-
-    throw new DumpDieException(stream_get_contents($output, -1, 0));
 }
 
 
