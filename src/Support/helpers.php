@@ -43,12 +43,12 @@ if (!function_exists('env')) {
     }
 }
 
-if (!function_exists('ddd')) {
+if (!function_exists('dd')) {
     /**
      * @param  mixed  ...$vars
      * @throws DumpDieException|ErrorException
      */
-    function ddd(...$vars)
+    function dd(...$vars)
     {
         $cloner = new VarCloner();
         $output = fopen('php://memory', 'r+b');
