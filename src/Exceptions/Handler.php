@@ -18,7 +18,7 @@ class Handler
     {
         $exceptionMessage = '';
         if ($throwable instanceof DumpDieException) {
-            return new Response(200, ['Content-Type' => 'text/plain'],
+            return new Response(200, ['Content-Type' => 'text/html'],
                 $throwable->getMessage());
         }
 

@@ -15,11 +15,12 @@
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-openssl": "*",
-        "twig/twig": "^3.0",
-        "react/http": "^1.1",
-        "vlucas/phpdotenv": "^5.0",
+        "christoph-kluge/reactphp-http-cors-middleware": "^2.0",
         "nikic/fast-route": "^1.3",
-        "christoph-kluge/reactphp-http-cors-middleware": "^2.0"
+        "react/http": "^1.1",
+        "symfony/var-dumper": "^5.2",
+        "twig/twig": "^3.0",
+        "vlucas/phpdotenv": "^5.0"
     },
     "autoload": {
         "files": [

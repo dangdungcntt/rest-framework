@@ -5,6 +5,8 @@ use Rest\Exceptions\DumpDieException;
 use Rest\Exceptions\HttpAbortException;
 use Rest\Support\Response;
 use Rest\Support\ViewResponse;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 if (!function_exists('app')) {
     function app(?string $class = null, ?string $parentClass = null)
@@ -44,13 +46,19 @@ if (!function_exists('env')) {
 if (!function_exists('dd')) {
     /**
      * @param  mixed  ...$vars
-     * @throws DumpDieException
+     * @throws DumpDieException|ErrorException
      */
     function dd(...$vars)
     {
-        ob_start();
-        var_dump(...$vars);
-        throw new DumpDieException(ob_get_clean());
+        $cloner = new VarCloner();
+        $output = fopen('php://memory', 'r+b');
+        $dumper = new HtmlDumper($output);
+
+        foreach ($vars as $var) {
+            $dumper->dump($cloner->cloneVar($var), $output);
+        }
+
+        throw new DumpDieException(stream_get_contents($output, -1, 0));
     }
 }
 
