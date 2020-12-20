@@ -33,7 +33,7 @@ class Handler
 
         try {
             return $this->unknownException($throwable);
-        } catch (Throwable $throwable1) {
+        } catch (Throwable) {
             if (app()->isDebug()) {
                 $exceptionMessage = $throwable->getMessage().PHP_EOL.$throwable->getTraceAsString();
                 return new Response(500, ['Content-Type' => 'text/plain'],

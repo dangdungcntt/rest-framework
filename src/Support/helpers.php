@@ -9,7 +9,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 if (!function_exists('app')) {
-    function app(?string $class = null, ?string $parentClass = null)
+    function app(?string $class = null, ?string $parentClass = null): mixed
     {
         if ($class) {
             $parentClass ??= debug_backtrace(false)[1]['class'] ?? null;
@@ -37,7 +37,7 @@ if (!function_exists('response')) {
 }
 
 if (!function_exists('env')) {
-    function env(string $key, $default = null)
+    function env(string $key, $default = null): mixed
     {
         return $_ENV[$key] ?? $default;
     }

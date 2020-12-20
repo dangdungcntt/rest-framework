@@ -6,6 +6,7 @@ use Psr\Http\Message\StreamInterface;
 use React\Http\Io\HttpBodyStream;
 use React\Stream\ReadableStreamInterface;
 use RingCentral\Psr7\Response as Psr7Response;
+
 use function RingCentral\Psr7\stream_for;
 
 class Response extends Psr7Response
@@ -59,7 +60,7 @@ class Response extends Psr7Response
             ->withHeaders($headers);
     }
 
-    public function withHeaders(array $headers)
+    public function withHeaders(array $headers): Response
     {
         $new = clone $this;
         $new->setHeaders($headers);

@@ -17,7 +17,7 @@ use Twig\Loader\FilesystemLoader;
 
 class Application
 {
-    const VERSION = '1.0.0';
+    const VERSION = '1.2.0';
 
     protected static Application $app;
     protected Container $container;

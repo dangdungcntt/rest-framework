@@ -4,6 +4,7 @@ namespace Rest;
 
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
+
 use function FastRoute\simpleDispatcher;
 
 class Router
@@ -22,7 +23,7 @@ class Router
         //Default router
     }
 
-    public function dispatch($httpMethod, $uri)
+    public function dispatch($httpMethod, $uri): array
     {
         return $this->dispatcher->dispatch($httpMethod, $uri);
     }

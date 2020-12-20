@@ -7,13 +7,13 @@ class ViewResponse extends Response
     protected string $viewName;
     protected array $data;
 
-    public function withView(string $viewName): self
+    public function withView(string $viewName): static
     {
         $this->viewName = $viewName;
         return $this;
     }
 
-    public function withData(array $data): self
+    public function withData(array $data): static
     {
         $this->data = $data;
         return $this;

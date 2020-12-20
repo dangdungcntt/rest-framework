@@ -1,23 +1,20 @@
 <?php
 
-
 namespace Rest;
 
-
 use Closure;
-use Rest\Support\Response;
-use Rest\Support\ViewResponse;
 use FastRoute\Dispatcher;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Promise\PromiseInterface;
+use Rest\Support\Response;
+use Rest\Support\ViewResponse;
 use RuntimeException;
 use Throwable;
+
 use function RingCentral\Psr7\stream_for;
 
 class RequestHandler
 {
-    protected array $resolvedControllers = [];
-
     /**
      * @var Application
      */
@@ -33,7 +30,7 @@ class RequestHandler
         $this->router = $router;
     }
 
-    public function __invoke(ServerRequestInterface $request)
+    public function __invoke(ServerRequestInterface $request): PromiseInterface|Response
     {
         try {
             $routeInfo = $this->router->dispatch($request->getMethod(), $request->getUri()->getPath());
@@ -53,7 +50,7 @@ class RequestHandler
 
     }
 
-    protected function handleResponse($response)
+    protected function handleResponse($response): PromiseInterface|Response
     {
         if ($response instanceof PromiseInterface) {
             return $response->then(function ($res) {
@@ -78,7 +75,7 @@ class RequestHandler
         return new Response(200, [], $response);
     }
 
-    protected function handleRequest(ServerRequestInterface $request, array $routeInfo)
+    protected function handleRequest(ServerRequestInterface $request, array $routeInfo): mixed
     {
         $handler = $routeInfo[1];
         $params  = array_values($routeInfo[2]);

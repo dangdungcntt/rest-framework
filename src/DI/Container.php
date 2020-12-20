@@ -1,16 +1,15 @@
 <?php
 
-
 namespace Rest\DI;
 
-
 use Closure;
-use Rest\Contracts\DIContainer;
-use Rest\Contracts\Singleton;
-use Rest\Exceptions\DICannotConstructException;
 use LogicException;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionParameter;
+use Rest\Contracts\DIContainer;
+use Rest\Contracts\Singleton;
+use Rest\Exceptions\DICannotConstructException;
 
 class Container implements DIContainer
 {
@@ -22,18 +21,19 @@ class Container implements DIContainer
 
     protected array $singleton = [];
 
-    public static function getInstance()
+    public static function getInstance(): static
     {
         return self::$instance ??= new static();
     }
 
     /**
+     * @param  mixed  $name
      * @param  string|null  $parentName
-     * @return Singleton|mixed
+     * @return mixed
      * @throws DICannotConstructException
      * @throws ReflectionException
      */
-    public function resolve($name, ?string $parentName = null)
+    public function resolve(mixed $name, ?string $parentName = null): mixed
     {
         if (is_string($name)) {
             if (is_string($parentName)) {
@@ -59,7 +59,7 @@ class Container implements DIContainer
         return $this->saveSingletonAndReturn($name, $this->constructInstance($name));
     }
 
-    protected function saveSingletonAndReturn($name, $object)
+    protected function saveSingletonAndReturn(mixed $name, mixed $object): mixed
     {
         $isSingleton = is_string($name) && (
                 isset($this->singleton[$name])
@@ -77,7 +77,7 @@ class Container implements DIContainer
      * @throws DICannotConstructException
      * @throws ReflectionException
      */
-    protected function constructInstance($name)
+    protected function constructInstance(mixed $name): mixed
     {
         if ($name instanceof Closure) {
             return $name($this);
@@ -88,7 +88,9 @@ class Container implements DIContainer
         }
 
         if (interface_exists($name)) {
-            throw new DICannotConstructException(sprintf('Cannot construct interface %s without bind. Please bind this interface in Container', $name));
+            throw new DICannotConstructException(
+                sprintf('Cannot construct interface %s without bind. Please bind this interface in Container', $name)
+            );
         }
 
         if (!class_exists($name)) {
@@ -109,27 +111,30 @@ class Container implements DIContainer
 
     /**
      * @param $name
-     * @param $params
+     * @param ReflectionParameter[] $params
      * @return array
      * @throws DICannotConstructException
      * @throws ReflectionException
      */
-    protected function buildParams($name, $params)
+    protected function buildParams(string $name, array $params): array
     {
         $resolvedParams = [];
         foreach ($params as $param) {
             $type = $param->getType();
 
-            if (is_null($type) || $type->isBuiltin()) {
+            if (is_null($type) || $type instanceof \ReflectionUnionType || ($type instanceof \ReflectionNamedType && $type->isBuiltin())) {
                 if ($param->isDefaultValueAvailable()) {
                     $resolvedParams[] = $param->getDefaultValue();
                     continue;
                 }
-                throw new DICannotConstructException("Cannot construct $name because \${$param->getName()} is not initializable");
+                throw new DICannotConstructException(
+                    "Cannot construct $name because \${$param->getName()} is not initializable"
+                );
             }
+            /** @var \ReflectionNamedType $type */
 
             try {
-                $resolvedParams[] = $this->resolve($param->getClass()->getName(), $name);
+                $resolvedParams[] = $this->resolve($type->getName(), $name);
             } catch (DICannotConstructException $exception) {
                 if ($param->isDefaultValueAvailable()) {
                     $resolvedParams[] = $param->getDefaultValue();
@@ -141,7 +146,7 @@ class Container implements DIContainer
         return $resolvedParams;
     }
 
-    public function bind(string $name, $value, ?string $parentName = null)
+    public function bind(string $name, $value, ?string $parentName = null): static
     {
         if (is_string($parentName)) {
             $name = "$name-$parentName";
@@ -150,7 +155,7 @@ class Container implements DIContainer
         return $this;
     }
 
-    public function singleton(string $name, $value, ?string $parentName = null)
+    public function singleton(string $name, $value, ?string $parentName = null): static
     {
         if (is_string($parentName)) {
             $name = "$name-$parentName";
