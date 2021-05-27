@@ -48,6 +48,11 @@ class Handler
         }
     }
 
+    /**
+     * @param  \Throwable  $throwable
+     * @return \Rest\Support\Response
+     * @throws \Throwable
+     */
     protected function unknownException(Throwable $throwable): Response
     {
         throw $throwable;

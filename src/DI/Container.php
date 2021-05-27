@@ -72,10 +72,10 @@ class Container implements DIContainer
     }
 
     /**
-     * @param $name
+     * @param  mixed  $name
      * @return mixed
-     * @throws DICannotConstructException
-     * @throws ReflectionException
+     * @throws \ReflectionException
+     * @throws \Rest\Exceptions\DICannotConstructException
      */
     protected function constructInstance(mixed $name): mixed
     {
@@ -110,11 +110,11 @@ class Container implements DIContainer
     }
 
     /**
-     * @param $name
-     * @param ReflectionParameter[] $params
+     * @param  string  $name
+     * @param  ReflectionParameter[]  $params
      * @return array
-     * @throws DICannotConstructException
-     * @throws ReflectionException
+     * @throws \ReflectionException
+     * @throws \Rest\Exceptions\DICannotConstructException
      */
     protected function buildParams(string $name, array $params): array
     {

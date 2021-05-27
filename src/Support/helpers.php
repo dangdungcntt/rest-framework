@@ -9,6 +9,13 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 if (!function_exists('app')) {
+    /**
+     * @param  string|null  $class
+     * @param  string|null  $parentClass
+     * @return mixed
+     * @throws \ReflectionException
+     * @throws \Rest\Exceptions\DICannotConstructException
+     */
     function app(?string $class = null, ?string $parentClass = null): mixed
     {
         if ($class) {
@@ -66,10 +73,10 @@ if (!function_exists('dd')) {
 if (!function_exists('abort')) {
     /**
      * @param  int  $status
-     * @param  mixed  $message
+     * @param  string  $message
      * @throws HttpAbortException
      */
-    function abort($status = 500, $message = 'Internal Server Error')
+    function abort(int $status = 500, string $message = 'Internal Server Error')
     {
         throw new HttpAbortException(is_array($message) ? json_encode($message) : $message, $status);
     }
@@ -77,12 +84,12 @@ if (!function_exists('abort')) {
 
 if (!function_exists('abort_if')) {
     /**
-     * @param $condition
+     * @param  bool  $condition
      * @param  int  $status
      * @param  mixed  $message
      * @throws HttpAbortException
      */
-    function abort_if($condition, $status = 500, $message = 'Internal Server Error')
+    function abort_if(bool $condition, int $status = 500, string $message = 'Internal Server Error')
     {
         if ($condition) {
             abort($status, $message);
@@ -92,12 +99,12 @@ if (!function_exists('abort_if')) {
 
 if (!function_exists('abort_unless')) {
     /**
-     * @param $condition
+     * @param  bool  $condition
      * @param  int  $status
      * @param  mixed  $message
-     * @throws HttpAbortException
+     * @throws \Rest\Exceptions\HttpAbortException
      */
-    function abort_unless($condition, $status = 500, $message = 'Internal Server Error')
+    function abort_unless(bool $condition, int $status = 500, string $message = 'Internal Server Error')
     {
         abort_if(!$condition, $status, $message);
     }
@@ -109,7 +116,7 @@ if (!function_exists('logger')) {
         if ($message instanceof Throwable) {
             $message = $message->getMessage().PHP_EOL.$message->getTraceAsString();
         }
-        printf("[%s] {$message}".PHP_EOL, date('Y-m-d H:i:s'));
+        printf("[%s] $message".PHP_EOL, date('Y-m-d H:i:s'));
     }
 }
 

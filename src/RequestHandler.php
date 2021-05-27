@@ -30,6 +30,11 @@ class RequestHandler
         $this->router = $router;
     }
 
+    /**
+     * @param  \Psr\Http\Message\ServerRequestInterface  $request
+     * @return \React\Promise\PromiseInterface|\Rest\Support\Response
+     * @throws \Throwable
+     */
     public function __invoke(ServerRequestInterface $request): PromiseInterface|Response
     {
         try {
@@ -50,6 +55,10 @@ class RequestHandler
 
     }
 
+    /**
+     * @throws \ReflectionException
+     * @throws \Rest\Exceptions\DICannotConstructException
+     */
     protected function handleResponse($response): PromiseInterface|Response
     {
         if ($response instanceof PromiseInterface) {
@@ -75,6 +84,13 @@ class RequestHandler
         return new Response(200, [], $response);
     }
 
+    /**
+     * @param  \Psr\Http\Message\ServerRequestInterface  $request
+     * @param  array  $routeInfo
+     * @return mixed
+     * @throws \ReflectionException
+     * @throws \Rest\Exceptions\DICannotConstructException
+     */
     protected function handleRequest(ServerRequestInterface $request, array $routeInfo): mixed
     {
         $handler = $routeInfo[1];

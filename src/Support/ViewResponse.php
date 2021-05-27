@@ -19,6 +19,10 @@ class ViewResponse extends Response
         return $this;
     }
 
+    /**
+     * @throws \ReflectionException
+     * @throws \Rest\Exceptions\DICannotConstructException
+     */
     public function render(): string
     {
         return app()->view->render($this->viewName, $this->data);

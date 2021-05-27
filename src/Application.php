@@ -8,7 +8,6 @@ use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use React\Http\Server as HttpServer;
 use React\Socket\Server as SocketServer;
-use ReflectionException;
 use Rest\DI\Container;
 use Rest\Exceptions\Handler;
 use Rest\Middleware\RequestBodyJsonParserMiddleware;
@@ -98,11 +97,11 @@ class Application
     /**
      * @param  string  $name
      * @param  string|null  $parentName
-     * @return Contracts\Singleton|mixed
-     * @throws Exceptions\DICannotConstructException
-     * @throws ReflectionException
+     * @return mixed
+     * @throws \ReflectionException
+     * @throws \Rest\Exceptions\DICannotConstructException
      */
-    public function make(string $name, ?string $parentName = null)
+    public function make(string $name, ?string $parentName = null): mixed
     {
         return $this->container->resolve($name, $parentName);
     }
@@ -149,7 +148,7 @@ class Application
         if (isset($this->onApplicationBoot)) {
             call_user_func($this->onApplicationBoot, $this);
         }
-        echo "Listening on {$serverAddress}".PHP_EOL;
+        echo "Listening on $serverAddress".PHP_EOL;
         $this->loop->run();
     }
 }
