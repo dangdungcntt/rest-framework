@@ -154,6 +154,5 @@ class Application
             call_user_func($this->onApplicationBoot, $this);
         }
         echo "Listening on $serverAddress".PHP_EOL;
-        $this->loop->run();
     }
 }
