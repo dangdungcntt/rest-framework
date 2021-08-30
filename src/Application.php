@@ -25,7 +25,7 @@ class Application
     protected array $middleware = [];
     protected LoopInterface $loop;
     protected HttpServer $server;
-    protected string $port = '3408';
+    protected string $listeningUri = '127.0.0.1:3408';
     protected bool $debug = false;
     protected string $viewPath = '';
     protected string $cachePath = '';
@@ -65,7 +65,7 @@ class Application
 
     public function listen(string $port): self
     {
-        $this->port = $port;
+        $this->listeningUri = $port;
         return $this;
     }
 
@@ -147,7 +147,7 @@ class Application
             }
         });
 
-        $socketServer  = new SocketServer($this->port, [], $this->loop);
+        $socketServer  = new SocketServer($this->listeningUri, [], $this->loop);
         $serverAddress = str_replace('tcp://', 'http://', $socketServer->getAddress());
         $this->server->listen($socketServer);
         if (isset($this->onApplicationBoot)) {
