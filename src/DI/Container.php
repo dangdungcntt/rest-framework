@@ -27,96 +27,97 @@ class Container implements DIContainer
     }
 
     /**
-     * @param  mixed  $name
-     * @param  string|null  $parentName
+     * @param  mixed  $bindingName
+     * @param  string|null  $contextClassName
      * @return mixed
      * @throws DICannotConstructException
      * @throws ReflectionException
      */
-    public function resolve(mixed $name, ?string $parentName = null): mixed
+    public function resolve(mixed $bindingName, ?string $contextClassName = null): mixed
     {
-        if (is_string($name)) {
-            if (is_string($parentName)) {
-                $key = "$name-$parentName";
+        if (is_string($bindingName)) {
+            if (is_string($contextClassName)) {
+                $key = "$bindingName-$contextClassName";
                 if (isset($this->resolved[$key])) {
                     return $this->resolved[$key];
                 }
 
                 if (isset($this->bind[$key])) {
-                    return $this->saveSingletonAndReturn($key, $this->resolve($this->bind[$key], $parentName));
+                    return $this->saveSingletonAndReturn($key, $this->resolve($this->bind[$key], $contextClassName));
                 }
             }
 
-            if (isset($this->resolved[$name])) {
-                return $this->resolved[$name];
+            if (isset($this->resolved[$bindingName])) {
+                return $this->resolved[$bindingName];
             }
 
-            if (isset($this->bind[$name])) {
-                return $this->saveSingletonAndReturn($name, $this->resolve($this->bind[$name], $parentName));
+            if (isset($this->bind[$bindingName])) {
+                return $this->saveSingletonAndReturn($bindingName, $this->resolve($this->bind[$bindingName], $contextClassName));
             }
         }
 
-        return $this->saveSingletonAndReturn($name, $this->constructInstance($name));
+        return $this->saveSingletonAndReturn($bindingName, $this->constructInstance($bindingName));
     }
 
-    protected function saveSingletonAndReturn(mixed $name, mixed $object): mixed
+    protected function saveSingletonAndReturn(mixed $bindingName, mixed $object): mixed
     {
-        $isSingleton = is_string($name) && (
-                isset($this->singleton[$name])
-                || (!isset($this->bind[$name]) && $object instanceof Singleton)
+        $isSingleton = is_string($bindingName) && (
+                isset($this->singleton[$bindingName])
+                || (!isset($this->bind[$bindingName]) && $object instanceof Singleton)
             );
-        if ($isSingleton && !isset($this->resolved[$name])) {
-            $this->resolved[$name] = $object;
+        if ($isSingleton && !isset($this->resolved[$bindingName])) {
+            $this->resolved[$bindingName] = $object;
         }
         return $object;
     }
 
     /**
-     * @param  mixed  $name
+     * @param  mixed  $className
      * @return mixed
      * @throws \ReflectionException
      * @throws \Rest\Exceptions\DICannotConstructException
      */
-    protected function constructInstance(mixed $name): mixed
+    protected function constructInstance(mixed $className): mixed
     {
-        if ($name instanceof Closure) {
-            return $name($this);
+        if ($className instanceof Closure) {
+            return $className($this);
         }
 
-        if (!is_string($name)) {
-            return $name;
+        if (!is_string($className)) {
+            return $className;
         }
 
-        if (interface_exists($name)) {
+        if (interface_exists($className)) {
             throw new DICannotConstructException(
-                sprintf('Cannot construct interface %s without bind. Please bind this interface in Container', $name)
+                sprintf('Cannot construct interface %s without bind. Please bind this interface in Container',
+                    $className)
             );
         }
 
-        if (!class_exists($name)) {
-            throw new LogicException(sprintf('Class %s do not exists ', $name));
+        if (!class_exists($className)) {
+            throw new LogicException(sprintf('Class %s do not exists ', $className));
         }
 
-        $reflection  = new ReflectionClass($name);
+        $reflection  = new ReflectionClass($className);
         $constructor = $reflection->getConstructor();
 
         if (is_null($constructor) || $constructor->getNumberOfParameters() == 0) {
-            return new $name();
+            return new $className();
         }
 
-        $resolvedParams = $this->buildParams($name, $constructor->getParameters());
+        $resolvedParams = $this->buildParams($className, $constructor->getParameters());
 
-        return new $name(...$resolvedParams);
+        return new $className(...$resolvedParams);
     }
 
     /**
-     * @param  string  $name
+     * @param  string  $className
      * @param  ReflectionParameter[]  $params
      * @return array
      * @throws \ReflectionException
      * @throws \Rest\Exceptions\DICannotConstructException
      */
-    protected function buildParams(string $name, array $params): array
+    protected function buildParams(string $className, array $params): array
     {
         $resolvedParams = [];
         foreach ($params as $param) {
@@ -128,13 +129,11 @@ class Container implements DIContainer
                     continue;
                 }
                 throw new DICannotConstructException(
-                    "Cannot construct $name because \${$param->getName()} is not initializable"
+                    "Cannot construct $className because \${$param->getName()} is not initializable"
                 );
             }
-            /** @var \ReflectionNamedType $type */
-
             try {
-                $resolvedParams[] = $this->resolve($type->getName(), $name);
+                $resolvedParams[] = $this->resolve($type->getName(), $className);
             } catch (DICannotConstructException $exception) {
                 if ($param->isDefaultValueAvailable()) {
                     $resolvedParams[] = $param->getDefaultValue();
@@ -146,24 +145,24 @@ class Container implements DIContainer
         return $resolvedParams;
     }
 
-    public function bind(string $name, $value, ?string $parentName = null): static
+    public function bind(string $bindingName, $value, ?string $parentName = null): static
     {
         if (is_string($parentName)) {
-            $name = "$name-$parentName";
+            $bindingName = "$bindingName-$parentName";
         }
-        $this->bind[$name] = $value;
+        $this->bind[$bindingName] = $value;
         return $this;
     }
 
-    public function singleton(string $name, $value, ?string $parentName = null): static
+    public function singleton(string $bindingName, $value, ?string $parentName = null): static
     {
         if (is_string($parentName)) {
-            $name = "$name-$parentName";
+            $bindingName = "$bindingName-$parentName";
         }
 
-        $this->singleton[$name] = true;
+        $this->singleton[$bindingName] = true;
 
-        $this->bind[$name] = $value;
+        $this->bind[$bindingName] = $value;
 
         return $this;
     }

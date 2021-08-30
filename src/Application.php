@@ -4,10 +4,10 @@ namespace Rest;
 
 use Closure;
 use Exception;
-use React\EventLoop\Factory;
+use React\EventLoop\Loop;
 use React\EventLoop\LoopInterface;
-use React\Http\Server as HttpServer;
-use React\Socket\Server as SocketServer;
+use React\Http\HttpServer;
+use React\Socket\SocketServer;
 use Rest\DI\Container;
 use Rest\Exceptions\Handler;
 use Rest\Middleware\RequestBodyJsonParserMiddleware;
@@ -16,7 +16,7 @@ use Twig\Loader\FilesystemLoader;
 
 class Application
 {
-    const VERSION = '1.2.0';
+    const VERSION = '1.3.0';
 
     protected static Application $app;
     protected Container $container;
@@ -34,7 +34,7 @@ class Application
 
     public function __construct()
     {
-        $this->loop             = Factory::create();
+        $this->loop             = Loop::get();
         $this->debug            = env('APP_DEBUG') == 'true';
         $this->middleware       = [
             new RequestBodyJsonParserMiddleware()
@@ -51,6 +51,11 @@ class Application
     public function isDebug(): bool
     {
         return $this->debug;
+    }
+
+    public function version(): string
+    {
+        return self::VERSION;
     }
 
     public function getEventLoop(): LoopInterface
@@ -95,15 +100,15 @@ class Application
     }
 
     /**
-     * @param  string  $name
-     * @param  string|null  $parentName
+     * @param  string  $bindingName
+     * @param  string|null  $contextClassName
      * @return mixed
      * @throws \ReflectionException
      * @throws \Rest\Exceptions\DICannotConstructException
      */
-    public function make(string $name, ?string $parentName = null): mixed
+    public function make(string $bindingName, ?string $contextClassName = null): mixed
     {
-        return $this->container->resolve($name, $parentName);
+        return $this->container->resolve($bindingName, $contextClassName);
     }
 
     public function bind(string $name, $value, ?string $parentName = null): self
@@ -142,7 +147,7 @@ class Application
             }
         });
 
-        $socketServer  = new SocketServer($this->port, $this->loop);
+        $socketServer  = new SocketServer($this->port, [], $this->loop);
         $serverAddress = str_replace('tcp://', 'http://', $socketServer->getAddress());
         $this->server->listen($socketServer);
         if (isset($this->onApplicationBoot)) {
