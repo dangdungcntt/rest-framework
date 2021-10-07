@@ -99,15 +99,23 @@ class Container implements DIContainer
         }
 
         $reflection  = new ReflectionClass($className);
+
+        if (!$reflection->isInstantiable()) {
+            throw new DICannotConstructException(
+                sprintf('Cannot construct Class %s without bind. Please bind this class in Container',
+                    $className)
+            );
+        }
+
         $constructor = $reflection->getConstructor();
 
         if (is_null($constructor) || $constructor->getNumberOfParameters() == 0) {
-            return new $className();
+            return $reflection->newInstance();
         }
 
         $resolvedParams = $this->buildParams($className, $constructor->getParameters());
 
-        return new $className(...$resolvedParams);
+        return $reflection->newInstance(...$resolvedParams);
     }
 
     /**
@@ -129,7 +137,7 @@ class Container implements DIContainer
                     continue;
                 }
                 throw new DICannotConstructException(
-                    "Cannot construct $className because \${$param->getName()} is not initializable"
+                    "Cannot construct $className because \${$param->getName()} is not instantiable"
                 );
             }
             try {
