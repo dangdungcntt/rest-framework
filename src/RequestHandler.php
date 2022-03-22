@@ -2,7 +2,6 @@
 
 namespace Rest;
 
-use Closure;
 use FastRoute\Dispatcher;
 use Psr\Http\Message\ServerRequestInterface;
 use React\Promise\PromiseInterface;
@@ -15,19 +14,10 @@ use function RingCentral\Psr7\stream_for;
 
 class RequestHandler
 {
-    /**
-     * @var Application
-     */
-    protected Application $app;
-    /**
-     * @var Router
-     */
-    protected Router $router;
-
-    public function __construct(Application $app, Router $router)
-    {
-        $this->app    = $app;
-        $this->router = $router;
+    public function __construct(
+        protected Application $app,
+        protected Router $router
+    ) {
     }
 
     /**
@@ -52,7 +42,6 @@ class RequestHandler
         } catch (Throwable $throwable) {
             return $this->app->exceptionHandler->handle($throwable);
         }
-
     }
 
     /**
@@ -96,7 +85,7 @@ class RequestHandler
         $handler = $routeInfo[1];
         $params  = array_values($routeInfo[2]);
 
-        if ($handler instanceof Closure) {
+        if (is_callable($handler)) {
             return $handler($request, ...$params);
         }
 

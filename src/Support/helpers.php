@@ -73,10 +73,10 @@ if (!function_exists('dd')) {
 if (!function_exists('abort')) {
     /**
      * @param  int  $status
-     * @param  string  $message
-     * @throws HttpAbortException
+     * @param  array|string  $message
+     * @throws \Rest\Exceptions\HttpAbortException
      */
-    function abort(int $status = 500, string $message = 'Internal Server Error')
+    function abort(int $status = 500, array|string $message = 'Internal Server Error')
     {
         throw new HttpAbortException(is_array($message) ? json_encode($message) : $message, $status);
     }
@@ -89,7 +89,7 @@ if (!function_exists('abort_if')) {
      * @param  mixed  $message
      * @throws HttpAbortException
      */
-    function abort_if(bool $condition, int $status = 500, string $message = 'Internal Server Error')
+    function abort_if(bool $condition, int $status = 500, array|string $message = 'Internal Server Error')
     {
         if ($condition) {
             abort($status, $message);
