@@ -89,7 +89,7 @@ if (!function_exists('abort_if')) {
      * @param  mixed  $message
      * @throws HttpAbortException
      */
-    function abort_if(bool $condition, int $status = 500, array|string $message = 'Internal Server Error')
+    function abort_if(bool $condition, int $status = 500, array|string $message = 'Internal Server Error'): void
     {
         if ($condition) {
             abort($status, $message);
@@ -104,14 +104,14 @@ if (!function_exists('abort_unless')) {
      * @param  mixed  $message
      * @throws \Rest\Exceptions\HttpAbortException
      */
-    function abort_unless(bool $condition, int $status = 500, string $message = 'Internal Server Error')
+    function abort_unless(bool $condition, int $status = 500, array|string $message = 'Internal Server Error'): void
     {
         abort_if(!$condition, $status, $message);
     }
 }
 
 if (!function_exists('logger')) {
-    function logger($message)
+    function logger($message): void
     {
         if ($message instanceof Throwable) {
             $message = $message->getMessage().PHP_EOL.$message->getTraceAsString();
@@ -121,7 +121,7 @@ if (!function_exists('logger')) {
 }
 
 if (!function_exists('deleteDir')) {
-    function deleteDir(string $dir, $preserve = false)
+    function deleteDir(string $dir, $preserve = false): void
     {
         foreach (glob("$dir/*") as $item) {
             is_dir($item) ? deleteDir($item) : unlink($item);
